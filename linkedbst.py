@@ -251,7 +251,12 @@ class LinkedBST(AbstractCollection):
                 return 0
             return 1 + max(height1(top.left), height1(top.right))
 
-        return height1(self._root)
+        height_calulated = height1(self._root)
+
+        if len(self) != 0:
+            height_calulated -= 1
+
+        return height_calulated
 
     def is_balanced(self):
         """
@@ -308,10 +313,10 @@ class LinkedBST(AbstractCollection):
         Rebalances the tree.
         :return:
         """
+        if self.is_balanced():
+            return
         elements_list = list(self.inorder())
-        elements_list.sort()
-
-        new_tree = LinkedBST()
+        self.clear()
 
         def add_middle_to_tree(elements_list, start, end):
             """
@@ -323,36 +328,23 @@ class LinkedBST(AbstractCollection):
             if start > end:
                 return
             middle = (start + end) // 2
-            new_tree.add(elements_list[middle])
+            self.add(elements_list[middle])
             add_middle_to_tree(elements_list, start, middle - 1)
             add_middle_to_tree(elements_list, middle + 1, end)
 
         add_middle_to_tree(elements_list, 0, len(elements_list) - 1)
 
-        self._root = new_tree._root
-        return self
-
     def successor(self, item):
         """
         Returns the smallest item that is larger than
         item, or None if there is no such item.
-        :param item: int
-        :type item: int
-        :return: int
-        :rtype: int
         """
 
         def successor1(top):
             """ Helper function to find successor """
-            if top == None:
+            if top is None:
                 return None
-
             if top.data > item:
-                if top.left == None or top.left.data <= item:
-                    return top.data
-                return successor1(top.left)
-
-            if top.right is None or top.right.data >= item:
                 return top.data
             return successor1(top.right)
 
@@ -378,8 +370,9 @@ class LinkedBST(AbstractCollection):
                     return top.data
                 return predecessor1(top.right)
 
-            if top.left == None or top.left.data <= item:
-                return top.data
+            if top.left == None:
+                return None
+
             return predecessor1(top.left)
 
         return predecessor1(self._root)
@@ -496,7 +489,7 @@ if __name__ == '__main__':
     print(lbst.is_balanced())  # False
     print(lbst.range_find(1, 14))  # [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
     print(lbst.successor(1))  # 2
-    print(lbst.predecessor(14))  # 13
+    print(lbst.predecessor(1))  # 13
 
     print(lbst.rebalance())
     print(lbst.is_balanced())  # True
